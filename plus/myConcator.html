@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+		<meta name="misapplication-tap-highlight" content="no" />
+		<meta name="HandheldFriendly" content="true" />
+		<meta name="MobileOptimized" content="320" />
+		<title>URGP</title>
+		<link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+		<style type="text/css">
+			*{margin: 0;padding: 0;}
+			li {
+				padding: 0.8em;
+				border-bottom: 1px solid #eaeaea;
+			}
+			li:active {
+				background: #f4f4f4;
+			}
+			.item {
+				display: flex;
+				justify-content: space-between;
+			}			
+			.chs {
+				font-size: 0.8em;
+				color: #838383;
+			}
+			.info{
+				display: flex;
+				flex-direction: column;
+			}
+			.opration{
+				display: flex;
+			}
+			.opration span{
+				height: 36px;
+				line-height: 36px;
+				font-size: 13px;
+				padding: 0 15px;
+				color: #fff;
+				margin: 0 10px;
+				border-radius: 15px;
+				overflow: hidden;
+			}
+			.opration span:nth-of-type(1){
+				background: #4b0;
+			}
+			.opration span:nth-of-type(2){
+				background: #f85;
+			}
+		</style>
+	</head>
+	<body onselectstart="return false;">
+		<header id="header">
+			<div class="nvbt iback" onclick="back()"></div>
+			<div class="nvtt">联系人列表</div>
+		</header>
+		<div id="content" class="content">
+			<ul id="plist" style="list-style:none;margin:0;padding:0;text-align:left;">
+			</ul>
+		</div>
+		<div id="output">
+			所有联系人
+		</div>
+	</body>
+</html>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript">	
+	initCon();
+	function initCon(){
+		var pList = document.getElementById("plist");
+		if(getLengthFun() > 0){
+			var concatorArr = getAllItem();
+			var elstr = '';
+			for(var i in concatorArr){
+				elstr  += '<li class="item">'
+						+ '<p class="info">'
+						+ '<span>'+concatorArr[i].cName+'</span>'
+						+ '<span class="chs">'+concator[i].cNum+'</span>'		
+						+ '</p>'	
+						+ '<p class="opration">'	
+						+ '<span onclick="dial('+concatorArr[i].cNum+')">拨打</span>'		
+						+ '<span onclick="edit('+concatorArr[i]+')">编辑</span>'		
+						+ '</p>'				
+						+ '</li>'
+			}
+			pList.innerHTML = elstr;
+		}else{
+			pList.innerHTML = '<p class="nothing"><img src="../img/nothing.jpg"></p>';
+		}
+	}	
+	//获取本地数据存储长度
+	function getLengthFun(){
+		return plus.storage.getLength();
+	}
+	//获取所有数据
+	function getAllItem(){
+		var arr = [];
+		var itemLength = getLengthFun();
+		for ( var i=0; i < itemLength; i++ ) {
+			var keys = plus.storage.key(i);
+		  	var value = plus.storage.getItem(keys);
+		  	outLine( keys+"-->:"+value );
+		  	if(keys != "editConcator"){
+		  		var obj = {};
+		  		obj.cName = keys;
+		  		obj.cNum = value;
+		  		arr.push(obj);
+		  		outLine(keys+':'+value);
+		  	}
+		};
+		return arr;
+	}
+	//直接拨打电话
+	function dial(cnum) {
+		plus.device.dial(cnum, false);
+	}
+	//编辑联系人
+	function edit(obj){
+		//当前编辑对象
+		var objstr = JSON.stringify(obj);
+		plus.storage.setItem("editConcator",objstr);
+		clicked('plus/addConcator.html');
+	}
+</script>
+
+<script type="text/javascript">
+	/*
+	 *"plus/myConcator.html": {
+				"href": "plus/myConcator.html",
+				"resources": [
+					"js/immersed.js",
+					"js/common.js",
+					"css/common.css",
+					"img/orientationa.png",
+					"img/orientationbg.png",
+					"img/orientationc.png",
+					"img/nothing.jpg"
+				],
+				"refer": [
+					"plus/editConcator.html"
+				],
+				"priority": 2
+			}, 
+	 * */
+	
+	
+	/*[
+					"<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
+					"<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
+					"<uses-permission android:name=\"android.permission.READ_CONTACTS\"/>",
+					"<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
+					"<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
+					"<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
+					"<uses-permission  android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
+					"<uses-permission android:name=\"android.permission.WRITE_CONTACTS\"/>",
+					"<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+					"<uses-permission android:name=\"android.permission.CAMERA\"/>",
+					"<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>",
+					"<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>",
+					"<uses-permission android:name=\"android.permission.DEVICE_POWER\"/>",
+					"<uses-permission android:name=\"android.permission.SEND_SMS\"/>",
+					"<uses-permission android:name=\"android.permission.INTERNET\"/>",
+					"<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
+					"<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
+					"<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
+					"<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
+					"<uses-feature android:name=\"android.hardware.camera\"/>",
+					"<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
+					"<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
+					"<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>",
+					"<uses-permission android:name=\"android.permission.WRITE_SMS\"/>",
+					"<uses-permission android:name=\"android.permission.READ_SMS\"/>"
+				]*/
+</script>

@@ -1,0 +1,204 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="HandheldFriendly" content="true" />
+		<meta name="MobileOptimized" content="320" />
+		<title>URGP</title>
+		<script type="text/javascript" src="../js/common.js"></script>
+		<link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+		<style type="text/css">
+			*{margin: 0;padding: 0;}
+			
+			#dcontent{padding-bottom: 0;}
+			#dcontent p{
+				display: flex;
+				padding: 0.8em;
+    			border-bottom: 1px solid #eaeaea;
+			}
+			#dcontent p input{
+				/*flex: 1;*/
+				border: 0;
+				margin-left: 10px;
+				outline: 0;
+				font-size: 16px;
+				line-height: 21px;
+				width: 50%;
+			}
+			#dcontent p input::-webkit-input-placeholder {
+	        	font-size: 12px;
+     		}
+			#dcontent p input,#dcontent p span,#dcontent p i{
+				height: 21px;		
+			}
+			#dcontent p i{
+				display: none;
+				font-size: 12px;
+				color: #e82314;
+				font-style: normal;
+			}
+			#dcontent p em{
+				width: 18px;
+			    height: 18px;
+			    font-size: 16px;
+			    line-height: 18px;
+			    text-align: center;
+			    background: #CCCCCC;
+			    color: #FFFFFF;
+			    border-radius: 50%;
+			    overflow: hidden;
+			    text-indent: -1px;
+			    display: none;
+			    margin-left: 5px;
+			}
+			#btns{
+				padding: 0.8rem;
+			}
+			#btns p{
+				text-align: center;
+				height: 35px;
+				line-height: 35px;
+				border-radius: 5px;
+				color: #fff;
+				margin: 20px 0;
+			}
+			#btns p:nth-of-type(1){
+				background: #4b0;
+			}
+			#btns p:nth-of-type(2){
+				background: #f85;
+			}
+			
+			#messtip{
+				width: 100%;
+				position: fixed;
+				bottom: 5%;
+				display: none;
+			}
+			#messtip p{
+				width: 100px;
+				margin: auto;
+				height: 32px;
+				line-height: 32px;
+				border-radius: 5px;
+				text-align: center;
+				overflow: hidden;
+				background: #848080;
+				color: #FFFFFF;
+			}
+		</style>
+	</head>
+	<body>
+		<header id="header">
+			<div class="nvbt iback" onclick="back()"></div>
+			<div class="nvtt">新建联系人</div>
+		</header>
+		<div id="dcontent" class="dcontent">
+			<p>
+				<span>姓名</span>
+				<input type="text" placeholder="请输入姓名" oninput="toggleShow(0)" onblur="noShow(0)"/>
+				<i>姓名不能为空</i>
+				<em onclick="clearCon(0)">×</em>
+			</p>
+			<p>
+				<span>电话</span><input type="text" placeholder="请输入电话" oninput="toggleShow(1)" onblur="noShow(1)"/>
+				<i>号码不能为空</i>
+				<i>号码格式错误</i>
+				<em onclick="clearCon(1)">×</em>
+			</p>
+		</div>
+		<div id="btns">
+			<p onclick="addConcator()">保存</p>
+			<p onclick="back()">取消</p>
+		</div>
+		<div id="messtip">
+			<p>保存成功</p>
+		</div>
+	</body>
+</html>
+<script type="text/javascript">
+	function plusReady() {
+		// 锁定只能竖屏显示
+		plus.screen.lockOrientation("portrait-primary");
+	}
+	if(window.plus) {
+		plusReady();
+	} else {
+		document.addEventListener("plusready", plusReady, false);
+	}
+	var reg = /^((\+86)|((\+86)))?-?(13|14|15|18|17)[0-9]{9}$|^((\+86)|((\+86)))?-?(((0[1,2]{1}\d{1})?-?\d{8})|((0[3-9]{1}\d{2})?-?\d{7,8}))$/;
+	
+	//为修改值赋初值
+	if(plus.storage.getItem("editConcator")){
+		document.querySelector(".nvtt").innerHTML = "修改联系人";
+		var editobj = {};
+		editobj = JSON.parse(plus.storage.getItem("editConcator"));
+		var input= document.querySelectorAll("input");
+		input[0].value = editobj.cName;
+		input[1].value = editobj.cNum;
+	}
+	
+	//所有联系人
+	var concatorArr = [];
+	if(plus.storage.getItem("concator")){
+		var concatorArrstr = plus.storage.getItem("concator");
+		concatorArr = JSON.parse(concatorArrstr);
+	}
+	/*localStorage.setItem("user",JSON.stringify([{'user':'11','name':'11'},{'user':'22','name':'22'}]))*/
+	function addConcator(){
+		var input= document.querySelectorAll("input");
+		var cName,cNum;
+		if(input[0].value == ''){
+			input[0].nextElementSibling.style.display = "block";
+		}else{
+			cName = input[0].value;
+		}
+		if(input[1].value == ''){			
+			input[1].nextElementSibling.style.display = "block";
+		}else if(input[1].nextElementSibling.nextElementSibling.style.display == "none"){
+			cNum = input[1].value;
+		}
+		if(cName && cNum){
+			var obj = {};
+			obj.cName = cName;
+			obj.cNum = cNum;
+			//增加
+			plus.storage.setItem(cName,cNum);
+			var mess = document.getElementById("messtip");
+			mess.style.display = "block";
+			setTimeout(function(){
+				mess.style.display = "none";
+				back();
+			},1500)
+		}
+	}
+	function toggleShow(n){
+		var _input = document.querySelectorAll("input")[n];
+		document.querySelectorAll("em")[n].style.display = 'block';
+		if(_input.value != ''){
+			_input.nextElementSibling.style.display = "none";
+		}
+		if(n==1 ){
+			if(reg.test(_input.value)==false && _input.value != ''){
+				_input.nextElementSibling.nextElementSibling.style.display = "block";
+			}else{
+				_input.nextElementSibling.nextElementSibling.style.display = "none";
+			}
+		}
+	}
+	function noShow(n){
+		var _input = document.querySelectorAll("input")[n];
+		document.querySelectorAll("em")[n].style.display = 'none';
+		if(_input.value == ''){
+			_input.nextElementSibling.style.display = 'none';
+		}
+		if(n==1){
+			_input.nextElementSibling.nextElementSibling.style.display = "none";
+		}
+	}
+	function clearCon(n){
+		var _input = document.querySelectorAll("input")[n];
+		_input.value = '';
+	}
+</script>
